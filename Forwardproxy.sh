@@ -140,8 +140,41 @@ EFC
 
 }
 
-# 其他函数(原封不动复制) 
-...
+# 重启Caddy
+function restart_caddy(){
+  sudo systemctl restart caddy
+}
+
+# 停止Caddy
+function stop_caddy(){
+  sudo systemctl stop caddy
+}  
+
+# 查看Caddy状态
+function check_status(){
+  sudo systemctl status caddy
+}
+
+# 切换BBR状态
+function toggle_bbr(){
+
+  # 判断BBR状态
+  bbr_status=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+
+  if [ "$bbr_status" == "bbr" ]; then
+    # 关闭BBR
+    echo "net.core.default_qdisc=fq" | sudo tee -a /etc/sysctl.conf
+    echo "net.ipv4.tcp_congestion_control=cubic" | sudo tee -a /etc/sysctl.conf
+  else
+    # 开启BBR
+    echo "net.core.default_qdisc=fq" | sudo tee -a /etc/sysctl.conf
+    echo "net.ipv4.tcp_congestion_control=bbr" | sudo tee -a /etc/sysctl.conf
+  fi
+
+  # 应用更改
+  sudo sysctl -p
+  
+}
 
 # 主菜单显示
 function main_menu(){
@@ -164,9 +197,45 @@ Caddy 一键安装脚本
 EFC
 
 # 读取选择
-...
+  read -p "请输入选择:" option
+
+  case $option in
+  1)
+    install_caddy
+    ;;
+  2)
+    uninstall_caddy
+    ;;
+  3) 
+    configure_caddy
+    ;;
+  4)
+    restart_caddy  
+    ;;
+  5)
+    stop_caddy
+    ;;
+  6)
+    check_status
+    ;;
+  7)
+    exit 0
+    ;;  
+  8) 
+    main_menu
+    ;;
+  9)
+    toggle_bbr
+    ;;
+  *)
+    echo "无效选择,请重试!"
+    main_menu  
+    ;;
+  esac
 
 }
+
+
   
 # 运行主菜单
 main_menu
