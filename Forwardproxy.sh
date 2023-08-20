@@ -64,7 +64,7 @@ function configure_caddy(){
   read -p "请输入密码:" proxy_pass
 
   # 生成配置
-  cat <<EFC > $CADDY_CONFIG
+  cat <<EOF > $CADDY_CONFIG
 {
   "apps": {
     "http": {
@@ -115,7 +115,7 @@ function configure_caddy(){
     }
   }  
 }
-EFC
+EOF
 
   # 设置网站目录权限
   sudo mkdir -p /var/www/$domain
@@ -176,7 +176,7 @@ function toggle_bbr(){
 # 主菜单
 function main_menu(){
 
-  cat <<EOF
+  cat <<EOF >
   Caddy 一键安装脚本
 
   1. 安装Caddy
