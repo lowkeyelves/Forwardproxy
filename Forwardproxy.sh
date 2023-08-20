@@ -25,8 +25,8 @@ function install_caddy(){
   sudo ~/go/bin/xcaddy build --with github.com/caddyserver/forwardproxy@latest
 
   # 设置权限
-  sudo chmod +x ~/go/bin/caddy  
-  sudo mv ~/go/bin/caddy /usr/local/bin/
+  sudo chmod +x caddy  
+  sudo mv caddy /usr/bin/
 
   # 创建caddy用户和组
   sudo groupadd caddy
@@ -42,7 +42,7 @@ function install_caddy(){
 # 卸载Caddy
 function uninstall_caddy(){
 
-  sudo rm -rf /usr/local/bin/caddy
+  sudo rm -rf /usr/bin/caddy
   sudo rm -rf /etc/caddy
   sudo rm -rf $CADDY_SERVICE
 
