@@ -27,15 +27,34 @@ function install_caddy(){
   # 设置权限
   sudo chmod +x caddy  
   sudo mv caddy /usr/bin/
+  sudo mkdir /etc/caddy
+  sudo touch /etc/caddy/Caddy.json
 
   # 创建caddy用户和组
   sudo groupadd caddy
   sudo useradd -g caddy caddy
 
   # 创建caddy.service
-  caddy_service="[Unit]\nDescription=Caddy\nDocumentation=https://caddyserver.com/docs/\nAfter=network.target network-online.target\nRequires=network-online.target\n\n[Service]\nUser=caddy\nGroup=caddy\nExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile\nExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile\nTimeoutStopSec=5s\nLimitNOFILE=1048576\nLimitNPROC=512\nPrivateTmp=true\nProtectSystem=full\nAmbientCapabilities=CAP_NET_BIND_SERVICE\n\n[Install]\nWantedBy=multi-user.target"
+  caddy_service="[Unit]
+Description=Caddy
+Documentation=https://caddyserver.com/docs/
+After=network.target
 
-  echo "$caddy_service" | sudo tee $CADDY_SERVICE > /dev/null
+[Service]
+User=root
+ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/caddy.json
+ExecReload=/usr/bin/caddy reload --config /etc/caddy/caddy.json
+TimeoutStopSec=5s
+LimitNOFILE=1048576
+LimitNPROC=512
+PrivateTmp=true
+ProtectSystem=full
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
+"
+echo "$caddy_service" | sudo tee $CADDY_SERVICE > /dev/null
   
 }
 
@@ -51,14 +70,13 @@ function uninstall_caddy(){
 # 配置Caddy
 function configure_caddy(){
   
-  # 开启端口
+# 开启端口
+  sudo ufw allow 22
   sudo ufw allow 80
   sudo ufw allow 443
   sudo ufw allow 443/udp
   sudo ufw enable
 
-  # 创建配置目录
-  sudo mkdir -p /etc/caddy
   
   # 读取用户输入
   read -p "请输入域名:" domain
@@ -69,55 +87,52 @@ function configure_caddy(){
   # 生成配置
   cat <<EFC > $CADDY_CONFIG
 {
-  "apps": {
-    "http": {
-      "servers": {
-        "srv0": {
-          "listen": [":443"], 
-          "routes": [
-            {
-              "handle": [
-                {
-                  "handler": "forward_proxy",
-                  "hide_ip": true,
-                  "hide_via": true,
-                  "auth_user": "$proxy_user",
-                  "auth_pass": "$proxy_pass"
+    "admin": {"disabled": true},
+    "apps": {
+        "http": {
+            "servers": {
+                "srv0": {
+                    "listen": [":443"],
+                    "logs": {},
+                    "routes": [{
+                        "handle": [{
+                            "handler": "forward_proxy",
+                            "hide_ip": true,  
+                            "hide_via": true,
+                            "auth_user": "$proxy_user", 
+                            "auth_pass": "$proxy_pass"  
+                        }]
+                    }, 
+                    {
+                    "match": [{"host": ["$domain"]}],  
+                    "handle": [{
+                        "handler": "file_server",
+                        "root": "/var/www/$domain"   
+                    }],
+                    "terminal": false
+                    }],
+                    "tls_connection_policies": [{
+                        "match": {"sni": ["$domain"]}  
+                    }],
+                    "experimental_http3": true,     
+                    "allow_h2c": false      
                 }
-              ]
-            },
-            {
-              "match": [
-                {
-                  "host": ["$domain"]
-                }
-              ],
-              "handle": [
-                {
-                  "handler": "file_server",
-                  "root": "/var/www/$domain"
-                }
-              ]
             }
-          ]
+        },
+        "tls": {
+            "automation": {
+                "policies": [{
+                    "subjects": ["$domain"],  
+                    "issuer": {
+                        "email": "$email",  
+                        "module": "acme"
+                    }
+                }]
+            }
         }
-      }
-    },
-    "tls": {
-      "automation": {        
-        "policies": [
-          {            
-            "subjects": ["$domain"],
-            "issuer": {
-              "email": "$email",
-              "module": "acme"
-            }
-          }
-        ]
-      }
     }
-  }  
 }
+
 EFC
 
   # 设置网站目录权限
