@@ -64,7 +64,7 @@ function configure_caddy(){
   read -p "请输入密码:" proxy_pass
 
   # 生成配置
-  cat <<EOF > $CADDY_CONFIG
+  cat <<EFC > $CADDY_CONFIG
 {
   "apps": {
     "http": {
@@ -115,7 +115,7 @@ function configure_caddy(){
     }
   }  
 }
-EOF
+EFC
 
   # 设置网站目录权限
   sudo mkdir -p /var/www/$domain
