@@ -176,7 +176,7 @@ function toggle_bbr(){
 # 主菜单
 function main_menu(){
 
-  cat <<EOF 
+  cat <<EOF
   Caddy 一键安装脚本
 
   1. 安装Caddy
@@ -233,4 +233,3 @@ function main_menu(){
 
 # 运行脚本
 main_menu
-}
