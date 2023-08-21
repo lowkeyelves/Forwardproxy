@@ -70,7 +70,7 @@ do
       sudo mkdir -p /etc/caddy /var/www/html
       
       # Caddyfile 模板
-      cat <<EOF | sudo tee /etc/caddy/Caddyfile
+      sudo tee /etc/caddy/Caddyfile <<EOF 
       {domain}:80 {
         redir https://{domain}  
       }
@@ -140,14 +140,12 @@ do
       sudo ufw enable
 
       # 安装 Caddy
-      sudo systemctl daemon-reload
-      sudo systemctl enable caddy
       sudo systemctl start caddy
 
       # 等待证书申请
       sleep 15
 
-      if [ -f "/etc/ssl/certs/caddy.pem" ]; then
+      if [ -f "/etc/ssl/certs/ca-certificates.crt" ]; then
         echo "证书申请成功!"
       else
         echo "证书申请失败,请检查域名和邮箱是否正确!" 
