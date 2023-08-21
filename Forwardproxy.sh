@@ -59,7 +59,7 @@ do
   echo "2. 退出"
 
   read -p "请输入选项[1-2]:" choice
-  case \$choice in
+  case $choice in
     1)  
       # 安装 Caddy  
       wget -O /usr/bin/caddy_linux_amd64 https://dl.lamp.sh/files/caddy_linux_amd64
@@ -140,6 +140,8 @@ do
       sudo ufw enable
 
       # 安装 Caddy
+      sudo systemctl daemon-reload
+      sudo systemctl enable caddy
       sudo systemctl start caddy
 
       # 等待证书申请
