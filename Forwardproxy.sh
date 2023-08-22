@@ -108,8 +108,8 @@ EOF
       mkdir -p /var/www/html
       sudo chown -R caddy:caddy /var/www/html
 
-      # 安装 caddy 服务
-      sudo tee /etc/systemd/system/caddy.service <<EOF
+# 安装 caddy 服务
+sudo tee /etc/systemd/system/caddy.service <<EOF
       [Unit]
       Description=Caddy
       After=network.target network-online.target
@@ -129,7 +129,7 @@ EOF
 
       [Install]
       WantedBy=multi-user.target
-      EOF
+EOF
 
       # 开启端口
       sudo ufw allow 22
