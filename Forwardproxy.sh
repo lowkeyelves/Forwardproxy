@@ -69,13 +69,12 @@ do
       # 创建目录
       sudo mkdir -p /etc/caddy /var/www/html
       
-      # Caddyfile 模板
-      sudo tee /etc/caddy/Caddyfile <<EOF 
-      {domain}:80 {
-        redir https://{domain}  
-      }
-
-      {domain}:443 {
+# Caddyfile 模板
+sudo tee /etc/caddy/Caddyfile <<EOF 
+{domain}:80 {
+ redir https://{domain}  
+}
+{domain}:443 {
         gzip
         timeouts none  
         tls {email}
@@ -85,9 +84,9 @@ do
           basicauth {username} {password}
           hide_ip
 		  probe_resistance amazon.com
-        }
-      }
-      EOF
+}
+}
+EOF
 
       # 读取用户输入
       read -p "请输入域名:" domain
