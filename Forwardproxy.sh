@@ -110,55 +110,55 @@ EOF
 
 # 安装 caddy 服务
 sudo tee /etc/systemd/system/caddy.service <<EOF
-      [Unit]
-      Description=Caddy
-      After=network.target network-online.target
-      Requires=network-online.target
+[Unit]
+Description=Caddy
+After=network.target network-online.target
+Requires=network-online.target
 
-      [Service]
-      User=caddy
-      Group=caddy
-      ExecStart=/usr/bin/caddy -conf /etc/caddy/Caddyfile -agree=true
-      ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile
-      TimeoutStopSec=5s
-      LimitNOFILE=1048576
-      LimitNPROC=512
-      PrivateTmp=true
-      ProtectSystem=full
-      AmbientCapabilities=CAP_NET_BIND_SERVICE
+[Service]
+User=caddy
+Group=caddy
+ExecStart=/usr/bin/caddy -conf /etc/caddy/Caddyfile -agree=true
+ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile
+TimeoutStopSec=5s
+LimitNOFILE=1048576
+LimitNPROC=512
+PrivateTmp=true
+ProtectSystem=full
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 
-      [Install]
-      WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
 EOF
 
-      # 开启端口
-      sudo ufw allow 22
-      sudo ufw allow 80
-      sudo ufw allow 443
-      sudo ufw allow 443/udp
-      sudo ufw enable
+# 开启端口
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw allow 443/udp
+sudo ufw enable
 
-      # 安装 Caddy
-      sudo systemctl start caddy
+# 安装 Caddy
+sudo systemctl start caddy
 
-      # 等待证书申请
-      sleep 15
+# 等待证书申请
+sleep 15
 
-      if [ -f "/etc/ssl/certs/ca-certificates.crt" ]; then
-        echo "证书申请成功!"
-      else
-        echo "证书申请失败,请检查域名和邮箱是否正确!" 
-      fi
+if [ -f "/etc/ssl/certs/ca-certificates.crt" ]; then
+ echo "证书申请成功!"
+else
+ echo "证书申请失败,请检查域名和邮箱是否正确!" 
+fi
 
-      ;;
+;;
 
-    2)
-      exit 0
-      ;;
+2)
+exit 0
+;;
 
-    *)
-      echo "无效选项,请重试!"  
-      ;;
+*)
+echo "无效选项,请重试!"  
+;;
   esac
 done
 
